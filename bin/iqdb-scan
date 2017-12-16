@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+#
+# usage: iqdb-scan TAGS
+
+# Scans IQDB and produces a list of posts and their corresponding IQDB results.
+
+require_relative "setup"
+tags = ARGV[0] or abort "usage: iqdb-scan TAGS"
+
+$booru.posts.all(tags: tags, by: :page, workers: 10).pmap(10) do |post|
+  matches = $booru.iqdb_queries.index(post_id: post.id)
+  { post: post, iqdb: matches }
+end.each do |results|
+  puts results.to_json
+end

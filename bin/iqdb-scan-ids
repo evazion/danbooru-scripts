@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# usage: iqdb-scan-ids TAGS
+
+# Scans IQDB and produces a list of post IDs and IQDB results.
+# Output: '{ id: 1234, iqdb: [{id: 1234, score: 99.9999}, {id: 4567, score: 95.0}] }'
+
+set -eu
+
+search="$1 status:any"
+./bin/iqdb-scan "$search" 2> "$search.log" | jq -c '{ id: .post.id, iqdb: .iqdb | map({ id: .post_id, score: .score }) }' > "$search.ndjson"
